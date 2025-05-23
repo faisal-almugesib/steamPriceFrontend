@@ -36,7 +36,8 @@ export function PriceHistoryChart({ gameId }: PriceHistoryChartProps) {
         setLoading(true);
         setError(null);
         // Fetch data from the price history endpoint
-        const response = await fetch(`http://127.0.0.1:8000/price-history/${gameId}`);
+        const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000'; // Fallback for local development
+        const response = await fetch(`${backendUrl}/price-history/${gameId}`);
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

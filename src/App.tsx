@@ -43,7 +43,8 @@ function App() {
     
     setLoading(true)
     try {
-      const response = await fetch(`http://127.0.0.1:8000/search?query=${value}`)
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000'; // Fallback for local development
+      const response = await fetch(`${backendUrl}/search?query=${value}`)
       const data = await response.json()
       setResults(data)
     } catch (error) {
@@ -56,7 +57,8 @@ function App() {
 
   const fetchGameDetails = async (gameId: number) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/game-details/${gameId}`)
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000'; // Fallback for local development
+      const response = await fetch(`${backendUrl}/game-details/${gameId}`)
       const details = await response.json()
       return details
     } catch (error) {
