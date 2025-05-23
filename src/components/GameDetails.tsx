@@ -1,4 +1,4 @@
-import { Calendar, DollarSign, Building2, BookOpen, Clock } from "lucide-react"
+import { Calendar, DollarSign, Building2, BookOpen } from "lucide-react"
 import { PriceHistoryChart } from "./PriceHistoryChart";
 
 interface GameResult {
