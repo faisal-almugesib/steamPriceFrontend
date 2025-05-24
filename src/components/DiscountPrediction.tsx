@@ -10,9 +10,10 @@ interface PredictionData {
 
 interface DiscountPredictionProps {
   gameId: number; // Add gameId prop
+  currentPrice?: number; // Add currentPrice prop
 }
 
-export function DiscountPrediction({ gameId }: DiscountPredictionProps) {
+export function DiscountPrediction({ gameId, currentPrice }: DiscountPredictionProps) {
   const [prediction, setPrediction] = useState<PredictionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -78,16 +79,19 @@ export function DiscountPrediction({ gameId }: DiscountPredictionProps) {
     ? prediction.predicted_price.toFixed(2)
     : null; // Use null if price is invalid
   
-  const originalPriceValid = prediction.original_price !== undefined && prediction.original_price !== null && prediction.original_price > 0;
+  //we either use the original price passed from props if defined (we get it from steam) or else we use the highest price in historical data passed from historical data endpoint
+  const originalPriceToUse = currentPrice !== undefined && currentPrice !== null ? currentPrice : prediction.original_price;
+  
+  const originalPriceValid = originalPriceToUse !== undefined && originalPriceToUse !== null && originalPriceToUse > 0;
   const oldPriceValid = prediction.old_price !== undefined && prediction.old_price !== null;
   
   let discountDisplay = 'N/A';
   if (originalPriceValid && newPrice !== null) {
-    const discount = ((prediction.original_price - prediction.predicted_price) / prediction.original_price) * 100;
+    const discount = ((originalPriceToUse - prediction.predicted_price) / originalPriceToUse) * 100;
     if (!isNaN(discount)) {
-      discountDisplay = `${discount.toFixed(2)}% off from (${prediction.old_price?.toFixed(2) ?? 'N/A'})`;
+      discountDisplay = `${discount.toFixed(0)}% off from ($${originalPriceToUse?.toFixed(2) ?? 'N/A'})`;
     }
-  } else if (oldPriceValid) {
+  } else if (oldPriceValid) { //if we couldn't get the discount we will just show the latest price in the historical data
      discountDisplay = `Price was ${prediction.old_price?.toFixed(2)}`
   }
 
@@ -129,9 +133,12 @@ export function DiscountPrediction({ gameId }: DiscountPredictionProps) {
             {discountDisplay}
           </div>
 
-          <div className="text-md text-gray-400">
-            Expected around: <span className="font-semibold text-white">{formattedPredictedDate}</span>
-          </div>
+          {/* Only show predicted date if a percentage discount or predicted price is shown */}
+          {discountDisplay !== 'N/A' && !discountDisplay.startsWith('Price was ') && formattedPredictedDate !== 'Unknown' && (
+            <div className="text-md text-gray-400">
+              Expected around: <span className="font-semibold text-white">{formattedPredictedDate}</span>
+            </div>
+          )}
         </>
       )}
     </div>

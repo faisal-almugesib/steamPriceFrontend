@@ -29,6 +29,7 @@ function App() {
   const [results, setResults] = useState<GameResult[]>([])
   const [loading, setLoading] = useState(false)
   const [selectedGame, setSelectedGame] = useState<GameResult | null>(null)
+  const [detailsLoading, setDetailsLoading] = useState(false)
 
   const handleSearch = async (value: string) => {
     setSearch(value)
@@ -64,21 +65,23 @@ function App() {
   }
 
   const handleGameSelect = async (game: GameResult) => {
+    setSelectedGame(game)
+    setDetailsLoading(true)
+
     const details = await fetchGameDetails(game.id)
     if (details) {
       setSelectedGame({ ...game, ...details })
-    } else {
-      setSelectedGame(game)
     }
+    setDetailsLoading(false)
   }
 
   if (selectedGame) {
-    return <GameDetails game={selectedGame} onBack={() => setSelectedGame(null)} />
+    return <GameDetails game={selectedGame} onBack={() => setSelectedGame(null)} detailsLoading={detailsLoading} />
   }
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      <div className="min-h-screen flex flex-col items-center md:justify-center p-4 md:p-8">
         <div className="absolute top-4 right-4">
           <ModeToggle />
         </div>
@@ -92,13 +95,16 @@ function App() {
           />
           {(search.length > 0 || results.length > 0) && (
             <div className="p-4 max-h-[400px] overflow-y-auto">
-              {loading && <div className="text-gray-400">Loading...</div>}
+              <div className="text-sm text-gray-400 mb-2">
+                {loading ? 'Loading...' : 'Results'}
+              </div>
+
               {!loading && results.length === 0 && search.length > 0 && (
                 <div className="text-gray-400">No results found.</div>
               )}
+
               {results.length > 0 && (
                 <div className="space-y-2">
-                  <div className="text-sm text-gray-400 mb-2">Results</div>
                   {results.map((result) => (
                     <div 
                       key={result.id} 

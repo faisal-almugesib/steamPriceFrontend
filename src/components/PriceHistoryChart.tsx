@@ -20,11 +20,15 @@ interface PriceHistoryData {
 
 interface PriceHistoryChartProps {
   gameId: number; // Accept gameId prop
+  currentPrice?: number; // Accept currentPrice prop
 }
 
-export function PriceHistoryChart({ gameId }: PriceHistoryChartProps) {
+export function PriceHistoryChart({ gameId, currentPrice }: PriceHistoryChartProps) {
   //this creates a ref of type SVGSVGElement with initial value null
   const svgRef = useRef<SVGSVGElement>(null)
+  // Ref for the tooltip element
+  const tooltipRef = useRef<HTMLDivElement>(null); //tooltip is created as HTML
+
   // Add state for data, loading, and error
   const [priceHistoryData, setPriceHistoryData] = useState<PriceHistoryData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -125,8 +129,25 @@ export function PriceHistoryChart({ gameId }: PriceHistoryChartProps) {
       .append("circle")
       .attr("cx", d => x(d.date)!)
       .attr("cy", d => y(d.price))
-      .attr("r", 4)
+      .attr("r", 5) 
       .attr("fill", "#ffffff")
+      .attr("cursor", "pointer") // Indicate interactivity
+      .on("mouseover", (event, d) => { //d is our point
+        // Show tooltip on hover
+        const tooltip = d3.select(tooltipRef.current);
+        tooltip.style("opacity", 1).style("display", "block")
+          .html(`
+            <div className="text-sm font-semibold">${d.store}</div>
+            <div className="text-xs text-gray-400">${d.date}: $${d.price.toFixed(2)}</div>
+          `)
+          // Position near cursor, relative to the container
+          .style("left", (event.offsetX + 10) + "px") 
+          .style("top", (event.offsetY - 20) + "px");
+      })
+      .on("mouseout", () => {
+        // Hide tooltip on mouse out
+        d3.select(tooltipRef.current).style("opacity", 0).style("display", "none"); // Hide by setting display to none
+      });
 
     // Add price labels
     svg.selectAll("text.price-label")
@@ -141,9 +162,17 @@ export function PriceHistoryChart({ gameId }: PriceHistoryChartProps) {
       .text(d => `$${d.price}`)
   }, [priceHistoryData]) // Redraw chart when data changes
 
-  // Calculate highest price for discount percentage (if needed, or use lowest_price from API)
-  const highestPrice = priceHistoryData ? d3.max(priceHistoryData.history, d => d.price)! : 0;
-  const discount = priceHistoryData && highestPrice > 0 ? Math.round(((highestPrice - priceHistoryData.lowest_price.price) / highestPrice) * 100) : 0;
+  // Calculate discount percentage relative to the original price (currentPrice)
+  const originalPriceForLowestDiscount = currentPrice !== undefined && currentPrice !== null && currentPrice > 0 ? currentPrice : null;
+
+  let lowestDiscountDisplay = 'N/A';
+  if (priceHistoryData && priceHistoryData.lowest_price && originalPriceForLowestDiscount !== null) {
+     const discountFromOriginal = ((originalPriceForLowestDiscount - priceHistoryData.lowest_price.price) / originalPriceForLowestDiscount) * 100;
+     if (!isNaN(discountFromOriginal)) {
+        lowestDiscountDisplay = `${discountFromOriginal.toFixed(0)}% off from ($${currentPrice})`;
+     }
+  }
+
   const [year, month] = priceHistoryData ? priceHistoryData.lowest_price.date.split('-') : ['', ''];
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
   const lowestMonthYear = priceHistoryData && month ? `${monthNames[parseInt(month, 10) - 1]} ${year}` : 'N/A';
@@ -160,6 +189,10 @@ export function PriceHistoryChart({ gameId }: PriceHistoryChartProps) {
     return <div className="mt-8 text-gray-400 text-center">No price history data available.</div>;
   }
 
+  if (priceHistoryData.history.length === 1) {
+    return <div className="mt-8 text-gray-400 text-center">Insufficient historical data to display a chart.</div>;
+  }
+
   return (
     // this is the divs structure
     // [OUTER flex flex-col] 
@@ -169,24 +202,33 @@ export function PriceHistoryChart({ gameId }: PriceHistoryChartProps) {
     // |-- [INNER flex-row: chart | indicator]
     <div className="mt-8 flex flex-col items-center w-full">
       <h2 className="text-xl font-semibold mb-4 text-white">{priceHistoryData.title} Price History</h2>
-      <div className="flex w-full justify-center gap-8">
+      <div className="flex flex-col md:flex-row w-full justify-center gap-8 relative"> {/* Added relative positioning */}
         {/* Chart on the left */}
-        <div className="rounded-lg p-4 bg-transparent">
+        <div className="rounded-lg p-4 bg-transparent w-full md:w-auto overflow-x-auto">
           <svg ref={svgRef}></svg>
         </div>
         {/* Indicator and prediction stacked on the right */}
-        <div className="flex flex-col items-start gap-1 w-[320px] mt-[-50px]">
+        <div className="flex flex-col items-start gap-1 w-full md:w-[320px] mt-4 md:mt-[-50px]">
           <div className="rounded-lg p-8 w-full shadow-lg border">
             <div className="text-lg font-semibold mb-2 text-white">Lowest Price</div>
             {/* Use lowest_price from API */}
             <div className="text-3xl font-bold text-green-400 mb-2">${priceHistoryData.lowest_price.price.toFixed(2)}</div>
-            <div className="text-md text-gray-300 mb-2">{discount}% off from highest (${highestPrice.toFixed(2)})</div> {/* Still calculating discount based on fetched history */}
+            {/* Show discount relative to original price if available */}
+            <div className="text-md text-gray-300 mb-2">{lowestDiscountDisplay}</div>
             <div className="text-md text-gray-400">Occurred: <span className="font-semibold text-white">{lowestMonthYear}</span></div>
           </div>
           <div className="w-full">
-            <DiscountPrediction gameId={gameId} />
+            <DiscountPrediction gameId={gameId} currentPrice={currentPrice} />
           </div>
         </div>
+
+        {/* Tooltip element */}
+        <div 
+          ref={tooltipRef}
+          className="tooltip absolute bg-zinc-800 text-white p-2 rounded-md shadow-lg opacity-0 pointer-events-none transition-opacity duration-200"
+          style={{ zIndex: 100, display: 'none' }} 
+        ></div>
+
       </div>
     </div>
   )
