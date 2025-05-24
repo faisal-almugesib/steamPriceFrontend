@@ -22,7 +22,8 @@ export function DiscountPrediction({ gameId }: DiscountPredictionProps) {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch(`http://127.0.0.1:8000/predict-discount/${gameId}`);
+        const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000'; // Fallback for local development
+        const response = await fetch(`${backendUrl}/predict-discount/${gameId}`);
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

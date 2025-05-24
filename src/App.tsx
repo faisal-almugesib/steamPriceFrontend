@@ -83,20 +83,13 @@ function App() {
           <ModeToggle />
         </div>
 
-        <div className="w-full max-w-2xl rounded-lg border border-gray-700 bg-zinc-900 text-white shadow-lg">
-          <div className="border-b border-gray-700">
-            <div className="flex items-center space-x-4 p-4">
-              <div className="flex-1">
-                <input
-                  type="text"
-                  placeholder="Search games..."
-                  value={search}
-                  onChange={(e) => handleSearch(e.target.value)}
-                  className="border-none focus:ring-0"
-                />
-              </div>
-            </div>
-          </div>
+        <Command className="w-full max-w-2xl rounded-lg border border-gray-700 bg-zinc-900 text-white shadow-lg">
+          <CommandInput 
+            placeholder="Search games..." 
+            value={search}
+            onValueChange={handleSearch}
+            className="border-none focus:ring-0"
+          />
           {(search.length > 0 || results.length > 0) && (
             <div className="p-4 max-h-[400px] overflow-y-auto">
               {loading && <div className="text-gray-400">Loading...</div>}
@@ -122,7 +115,7 @@ function App() {
               )}
             </div>
           )}
-        </div>
+        </Command>
       </div>
     </ThemeProvider>
   )

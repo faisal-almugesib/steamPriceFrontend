@@ -35,7 +35,7 @@ export function GameDetails({ game, onBack }: GameDetailsProps) {
           <img src={game.image} className="w-68 h-42 rounded-lg object-cover" />
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <h1 className="text-3xl font-bold">{game.id}</h1>
+              <h1 className="text-3xl font-bold">{game.name}</h1>
               {game.age !== undefined && (
                 <span className="px-1 py-1 bg-blue-500/20 text-blue-400 rounded-md text-sm font-medium">
                   +{game.age}
