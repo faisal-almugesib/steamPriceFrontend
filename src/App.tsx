@@ -86,6 +86,8 @@ function App() {
           <ModeToggle />
         </div>
 
+        <h1 className="text-4xl font-bold mb-8 text-center">Games Price Dashboard</h1>
+
         <Command className="w-full max-w-2xl rounded-lg border border-gray-700 bg-zinc-900 text-white shadow-lg">
           <CommandInput 
             placeholder="Search games..." 
