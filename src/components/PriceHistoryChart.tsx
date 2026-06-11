@@ -19,15 +19,14 @@ interface PriceHistoryData {
 }
 
 interface PriceHistoryChartProps {
-  gameId: number; // Accept gameId prop
-  currentPrice?: number; // Accept currentPrice prop
+  gameId: number;
+  currentPrice?: number;
 }
 
 export function PriceHistoryChart({ gameId, currentPrice }: PriceHistoryChartProps) {
-  //this creates a ref of type SVGSVGElement with initial value null
   const svgRef = useRef<SVGSVGElement>(null)
   // Ref for the tooltip element
-  const tooltipRef = useRef<HTMLDivElement>(null); //tooltip is created as HTML
+  const tooltipRef = useRef<HTMLDivElement>(null);
 
   // Add state for data, loading, and error
   const [priceHistoryData, setPriceHistoryData] = useState<PriceHistoryData | null>(null);

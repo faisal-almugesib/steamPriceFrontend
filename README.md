@@ -1,54 +1,33 @@
-# React + TypeScript + Vite
+# Games Price Dashboard — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + TypeScript dashboard for tracking Steam game prices: search any game, view its price history on a custom **D3 chart** with tooltips, see store lows, and get an AI-predicted next discount.
 
-Currently, two official plugins are available:
+**🔗 Live: [games-stats.vercel.app](https://games-stats.vercel.app/)** · Backend: [steamPriceBackend](https://github.com/faisal-almugesib/steamPriceBackend)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+> ⚠️ The free-tier backend hosting (Railway) has expired, so search on the live site is currently offline — run the stack locally with the steps below. The UI itself is fully deployed.
 
-## Expanding the ESLint configuration
+## Preview
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+| Home | Search |
+|---|---|
+| ![Home](docs/screenshots/home.png) | ![Search results](docs/screenshots/app-search.png) |
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## Features
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- **Command-palette search** (cmdk + shadcn/ui) hitting the Steam Store API through the backend
+- **Price history chart** built from scratch with D3: multi-store series, hover tooltips, lowest-price marker
+- **Discount prediction** card — Gemini-generated estimate of the next sale date/price with confidence
+- **Dark/light mode** with a theme provider
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Stack
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+React 18 · TypeScript · Vite · Tailwind CSS · shadcn/ui · D3 v7
+
+## Run Locally
+
+```bash
+# 1. Start the backend (see steamPriceBackend README)
+# 2. Then:
+npm install
+VITE_BACKEND_URL=http://127.0.0.1:8000 npm run dev   # http://localhost:5173
 ```
