@@ -16,6 +16,8 @@ interface PriceHistoryData {
     store: string;
     date: string;
   };
+  fallback?: boolean;
+  note?: string;
 }
 
 interface PriceHistoryChartProps {
@@ -205,6 +207,11 @@ export function PriceHistoryChart({ gameId, currentPrice }: PriceHistoryChartPro
         {/* Chart on the left */}
         <div className="rounded-lg p-4 bg-transparent w-full md:w-auto overflow-x-auto">
           <svg ref={svgRef}></svg>
+          {priceHistoryData.fallback && (
+            <p className="text-xs text-gray-500 mt-1 text-center">
+              {priceHistoryData.note ?? 'Sample data — live price API unavailable'}
+            </p>
+          )}
         </div>
         {/* Indicator and prediction stacked on the right */}
         <div className="flex flex-col items-start gap-1 w-full md:w-[320px] mt-4 md:mt-[-50px]">

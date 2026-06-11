@@ -6,6 +6,8 @@ interface PredictionData {
   old_price: number; //the price in the latest month in the data
   original_price: number;
   confidence: number | string; // Added confidence field
+  fallback?: boolean;
+  note?: string;
 }
 
 interface DiscountPredictionProps {
@@ -112,6 +114,11 @@ export function DiscountPrediction({ gameId, currentPrice }: DiscountPredictionP
   return (
     <div className="rounded-lg p-8 w-full shadow-lg border">
       <div className="text-lg font-semibold mb-2 text-white">Next Discount Prediction</div>
+      {prediction.fallback && (
+        <div className="text-xs text-gray-500 mb-2">
+          {prediction.note ?? 'Sample estimate — AI prediction API unavailable'}
+        </div>
+      )}
 
       {prediction.confidence === "Low - Insufficient data" ? (
         <div className="text-md text-gray-400 mb-2">

@@ -6,11 +6,15 @@ React + TypeScript dashboard for tracking Steam game prices: search any game, vi
 
 > ⚠️ The free-tier backend hosting (Railway) has expired, so search on the live site is currently offline — run the stack locally with the steps below. The UI itself is fully deployed.
 
+> ℹ️ **Sample-data fallback:** the app runs fully without API keys. When the price-history (ITAD) or prediction (Gemini) APIs are unavailable, the backend serves clearly-flagged sample data and the UI marks it with small grey text ("Sample data — live price API unavailable"), as in the screenshot below.
+
 ## Preview
 
 | Home | Search |
 |---|---|
 | ![Home](docs/screenshots/home.png) | ![Search results](docs/screenshots/app-search.png) |
+
+![Game details with price history and prediction](docs/screenshots/game-details.png)
 
 ## Features
 
